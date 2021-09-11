@@ -1,5 +1,6 @@
 export const createItem = (title: string, children?: Item[]): Item => {
   const item: Item = {
+    id: "id_" + Math.random(),
     title,
     isOpen: children ? children.length > 0 : false,
     children: children || [],
