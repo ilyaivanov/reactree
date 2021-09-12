@@ -1,3 +1,5 @@
+import * as array from "./array";
+
 export const createItem = (title: string, children?: Item[]): Item => {
   const item: Item = {
     id: "id_" + Math.random(),
@@ -47,7 +49,7 @@ export const updateItemByPath = (
   const updateAt = (currentItem: Item, remainingPath: Path): Item => {
     if (remainingPath.length === 0) return update(currentItem);
     else {
-      const [nextIndex, otherPath] = shift(remainingPath);
+      const [nextIndex, otherPath] = array.shift(remainingPath);
       return currentItem.children[nextIndex]
         ? updateItemChildAt(currentItem, nextIndex, (i) =>
             updateAt(i, otherPath)
@@ -78,12 +80,12 @@ export const getItemBelow = (root: Item, path: Path): Path => {
   else {
     let nonLastParent = path;
     while (isLastItem(root, nonLastParent)) {
-      nonLastParent = removeLast(nonLastParent);
+      nonLastParent = array.removeLast(nonLastParent);
     }
 
     if (nonLastParent.length === 0) return path;
 
-    return updateLastItem(nonLastParent, (a) => a + 1);
+    return array.updateLastItem(nonLastParent, (a) => a + 1);
   }
 };
 
@@ -92,24 +94,27 @@ export const getItemAbove = (root: Item, path: Path): Path => {
 
   if (path.length === 1 && path[0] === 0) return [];
 
-  if (isFirstItem(path)) return removeLast(path);
+  if (isFirstItem(path)) return array.removeLast(path);
 
-  const previousSiblingPath = updateLastItem(path, (a) => a - 1);
+  const previousSiblingPath = array.updateLastItem(path, (a) => a - 1);
   return getLastNestedItem(root, previousSiblingPath);
 };
 
 //item utils
 
 const isLastItem = (root: Item, path: Path): boolean => {
-  const [rest, lastItem] = pop(path);
+  const [rest, lastItem] = array.pop(path);
   const item = getItemAtPath(root, rest);
-  return lastItemIndex(item.children) === lastItem;
+  return array.lastItemIndex(item.children) === lastItem;
 };
 
-export const getLastNestedItem = (root: Item, path: Path): Path => {
+const getLastNestedItem = (root: Item, path: Path): Path => {
   const item = getItemAtPath(root, path);
   if (item.isOpen)
-    return getLastNestedItem(root, [...path, lastItemIndex(item.children)]);
+    return getLastNestedItem(root, [
+      ...path,
+      array.lastItemIndex(item.children),
+    ]);
   else return path;
 };
 
@@ -121,31 +126,8 @@ const updateItemChildAt = (
   updater: (i: Item) => Item
 ) => ({
   ...item,
-  children: updateArrayAtIndex(item.children, index, updater),
+  children: array.updateArrayAtIndex(item.children, index, updater),
 });
-
-//Array utils
-const updateLastItem = <T>(arr: T[], update: (v: T) => T): T[] =>
-  updateArrayAtIndex(arr, lastItemIndex(arr), update);
-
-const updateArrayAtIndex = <T>(
-  arr: T[],
-  index: number,
-  update: (v: T) => T
-): T[] => {
-  const newArray = [...arr];
-  newArray[index] = update(arr[index]);
-  return newArray;
-};
-
-//non-mutative array ops
-const shift = <T>(arr: T[]): [T, T[]] => [arr[0], arr.slice(1)];
-
-const pop = <T>(arr: T[]): [T[], T] => [removeLast(arr), arr[arr.length - 1]];
-
-const removeLast = <T>(arr: T[]): T[] => arr.slice(0, arr.length - 1);
-
-const lastItemIndex = (arr: unknown[]): number => arr.length - 1;
 
 //Error handling
 const throwPathLookupError = (
