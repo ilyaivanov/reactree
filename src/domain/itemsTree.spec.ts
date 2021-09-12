@@ -111,12 +111,32 @@ describe("item below", () => {
 
   it("[1, 1, 2] is [2] (item at [1, 1, 2] is a last child, thus parents are traversed to find next item)", () =>
     expect(tree.getItemBelow(root, [1, 1, 2])).toEqual([2]));
+
+  it("[2] is [2] (item at [2] is a item in a tree)", () =>
+    expect(tree.getItemBelow(root, [2])).toEqual([2]));
 });
 
-//get item at path DONE
-//get path offset DONE
-//toggle item by path DONE
-//get item below
-//get item above
-//get parent
-//get child
+describe("item above", () => {
+  it("[] is [] (there is no items above root)", () =>
+    expect(tree.getItemAbove(root, [])).toEqual([]));
+
+  it("[0] is [1]", () => expect(tree.getItemAbove(root, [0])).toEqual([]));
+
+  it("[1] is [0] (item at [0] is empty, otherwise it's most-nested latest item would be returned)", () =>
+    expect(tree.getItemAbove(root, [1])).toEqual([0]));
+
+  it("[1, 0] is [1] (item at [1, 0] is first child)", () =>
+    expect(tree.getItemAbove(root, [1, 0])).toEqual([1]));
+
+  it("[1, 1] is [1, 0]", () =>
+    expect(tree.getItemAbove(root, [1, 1])).toEqual([1, 0]));
+
+  it("[1, 1, 0] is [1, 1]", () =>
+    expect(tree.getItemAbove(root, [1, 1, 0])).toEqual([1, 1]));
+
+  it("[1, 1, 1] is [1, 1, 0]", () =>
+    expect(tree.getItemAbove(root, [1, 1, 1])).toEqual([1, 1, 0]));
+
+  it("[2] is [1, 1, 2] (item at [1, 1, 2] is a last child of a previous sibling of [2]", () =>
+    expect(tree.getItemAbove(root, [2])).toEqual([1, 1, 2]));
+});
