@@ -14,8 +14,8 @@ const rootItem = tree.createItem("Root", [
 ]);
 
 function App() {
-  const [root] = useReducer((x) => x, rootItem);
-  const [selectedItemPath, setPath] = useState([0]);
+  const [root, setRoot] = useState(rootItem);
+  const [selectedPath, setPath] = useState([0]);
 
   const dimensions = useWindowSize();
 
@@ -25,11 +25,28 @@ function App() {
         setPath((path) => tree.getItemBelow(root, path));
       if (e.code === "ArrowUp")
         setPath((path) => tree.getItemAbove(root, path));
+
+      if (e.code === "ArrowLeft") {
+        const item = tree.getItemAtPath(root, selectedPath);
+        if (item.isOpen)
+          setRoot(tree.updateItemByPath(root, selectedPath, tree.closeItem));
+        else setPath(tree.getPathParent);
+      }
+      if (e.code === "ArrowRight") {
+        const item = tree.getItemAtPath(root, selectedPath);
+        if (!item.isOpen && item.children.length > 0)
+          setRoot(tree.updateItemByPath(root, selectedPath, tree.openItem));
+        else if (item.children.length > 0) setPath((p) => [...p, 0]);
+        else {
+          //load and append
+        }
+      }
     };
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [root]);
+  }, [root, selectedPath]);
+
   return (
     <div style={{ color: colors.text, backgroundColor: colors.background }}>
       <svg
@@ -37,8 +54,8 @@ function App() {
         width={dimensions.width}
         height={dimensions.height}
       >
-        {selectionBox(root, selectedItemPath)}
-        {itemView(root)}
+        {selectionBox(root, selectedPath)}
+        {itemView(root, root, [])}
       </svg>
     </div>
   );
@@ -57,15 +74,15 @@ const selectionBox = (root: Item, path: tree.Path) => {
   );
 };
 
-const itemView = (item: Item) => {
-  const y = item.parent
-    ? tree.getItemOffsetFromParent(item) * spacings.yStep
+const itemView = (root: Item, item: Item, path: tree.Path) => {
+  const y = !tree.isPathRoot(path)
+    ? tree.getItemOffsetFromParent(root, path) * spacings.yStep
     : spacings.gap;
-  const x = item.parent ? spacings.xStep : spacings.gap;
+  const x = !tree.isPathRoot(path) ? spacings.xStep : spacings.gap;
   return (
     <g transform={`translate(${x}, ${y})`} key={item.id}>
       <path
-        d={svgPath(item, y)}
+        d={svgPath(tree.isPathRoot(path), y)}
         strokeWidth={strokeWidth}
         stroke={colors.line}
         fill={"none"}
@@ -85,7 +102,12 @@ const itemView = (item: Item) => {
       >
         {item.title}
       </text>
-      <g>{item.isOpen && item.children.map(itemView)}</g>
+      <g>
+        {item.isOpen &&
+          item.children.map((item, index) =>
+            itemView(root, item, [...path, index])
+          )}
+      </g>
     </g>
   );
 };
@@ -94,8 +116,8 @@ const itemView = (item: Item) => {
 //it depends upon the stroke
 const strokeWidth: number = 2;
 const strokeOffset = strokeWidth === 1 ? 0.5 : 0;
-const svgPath = (item: Item, distanceToParent: number): string =>
-  item.parent
+const svgPath = (isRoot: boolean, distanceToParent: number): string =>
+  !isRoot
     ? `M0,${strokeOffset}H-${spacings.xStep + strokeOffset}V-${
         distanceToParent - spacings.circleRadius
       }`

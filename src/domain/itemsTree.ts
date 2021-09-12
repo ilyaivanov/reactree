@@ -1,26 +1,23 @@
 import * as array from "./array";
 
-export const createItem = (title: string, children?: Item[]): Item => {
-  const item: Item = {
-    id: "id_" + Math.random(),
-    title,
-    isOpen: children ? children.length > 0 : false,
-    children: children || [],
-  };
+export const createItem = (title: string, children?: Item[]): Item => ({
+  id: "id_" + Math.random(),
+  title,
+  isOpen: children ? children.length > 0 : false,
+  children: children || [],
+});
 
-  children && children.forEach((child) => (child.parent = item));
-  return item;
-};
-
-export const getItemOffsetFromParent = (item: Item) => {
-  if (!item.parent) return 0;
+export const getItemOffsetFromParent = (root: Item, path: Path) => {
+  if (isPathRoot(path)) return 0;
   else {
     const getChildrenCountIncludingSelf = (item: Item): number => {
       if (item.isOpen)
         return 1 + sumBy(item.children, getChildrenCountIncludingSelf);
       else return 1;
     };
-    const context = item.parent.children;
+    const parent = getItemAtPath(root, array.removeLast(path));
+    const item = getItemAtPath(root, path);
+    const context = parent.children;
     const index = context.indexOf(item);
     return 1 + sumBy(context.slice(0, index), getChildrenCountIncludingSelf);
   }
@@ -69,7 +66,7 @@ export const getPathPositionFromRoot = (root: Item, path: Path) => {
   let offset = 0;
   while (currentPath.length !== path.length) {
     currentPath.push(path[currentPath.length]);
-    offset += getItemOffsetFromParent(getItemAtPath(root, currentPath));
+    offset += getItemOffsetFromParent(root, currentPath);
   }
   return offset;
 };
@@ -83,14 +80,14 @@ export const getItemBelow = (root: Item, path: Path): Path => {
       nonLastParent = array.removeLast(nonLastParent);
     }
 
-    if (nonLastParent.length === 0) return path;
+    if (isPathRoot(nonLastParent)) return path;
 
     return array.updateLastItem(nonLastParent, (a) => a + 1);
   }
 };
 
 export const getItemAbove = (root: Item, path: Path): Path => {
-  if (path.length === 0) return [];
+  if (isPathRoot(path)) return [];
 
   if (path.length === 1 && path[0] === 0) return [];
 
@@ -100,7 +97,24 @@ export const getItemAbove = (root: Item, path: Path): Path => {
   return getLastNestedItem(root, previousSiblingPath);
 };
 
+export const closeItem = (item: Item): Item => ({
+  ...item,
+  isOpen: false,
+});
+
+export const openItem = (item: Item): Item => ({
+  ...item,
+  isOpen: true,
+});
+
+export const getPathParent = (path: Path): Path => {
+  if (isPathRoot(path)) return path;
+  else return array.removeLast(path);
+};
+
 //item utils
+
+export const isPathRoot = (path: Path) => path.length === 0;
 
 const isLastItem = (root: Item, path: Path): boolean => {
   const [rest, lastItem] = array.pop(path);
