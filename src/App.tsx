@@ -1,68 +1,23 @@
-import { useEffect, useState } from "react";
-import "./App.css";
+import { useEffect } from "react";
 import * as tree from "./domain/itemsTree";
 import { useWindowSize } from "./infra/useWindowDimensions";
-
-const rootItem = tree.createItem("Root", [
-  tree.createItem("Item 1"),
-  tree.createItem("Item 2", [
-    tree.createItem("Item 3"),
-    tree.createItem("Item 4"),
-    tree.createItem("Item 5"),
-  ]),
-  tree.createItem("Item 6"),
-]);
-
-const randomInt = (from: number, to: number) =>
-  Math.floor(from + Math.random() * (to - from));
-
-const randomItems = (): Item[] =>
-  Array.from(new Array(randomInt(5, 10))).map((a, i) => ({
-    id: "rid_" + Math.random(),
-    title: "Random Item " + i + 1,
-    children: [],
-    isOpen: false,
-  }));
+import { useItems } from "./useItems";
 
 function App() {
-  const [root, setRoot] = useState(rootItem);
-  const [selectedPath, setPath] = useState([0]);
-
+  const [{ root, path }, dispatch] = useItems();
   const dimensions = useWindowSize();
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "ArrowDown")
-        setPath((path) => tree.getItemBelow(root, path));
-      if (e.code === "ArrowUp")
-        setPath((path) => tree.getItemAbove(root, path));
-
-      if (e.code === "ArrowLeft") {
-        const item = tree.getItemAtPath(root, selectedPath);
-        if (item.isOpen)
-          setRoot(tree.updateItemByPath(root, selectedPath, tree.closeItem));
-        else setPath(tree.getPathParent);
-      }
-      if (e.code === "ArrowRight") {
-        const item = tree.getItemAtPath(root, selectedPath);
-        if (!item.isOpen && item.children.length > 0)
-          setRoot(tree.updateItemByPath(root, selectedPath, tree.openItem));
-        else if (item.children.length > 0) setPath((p) => [...p, 0]);
-        else {
-          setRoot(
-            tree.updateItemByPath(root, selectedPath, (i) => ({
-              ...i,
-              isOpen: true,
-              children: randomItems(),
-            }))
-          );
-        }
-      }
+      if (e.code === "ArrowDown") dispatch("moveDown");
+      if (e.code === "ArrowUp") dispatch("moveUp");
+      if (e.code === "ArrowLeft") dispatch("moveLeft");
+      if (e.code === "ArrowRight") dispatch("moveRight");
     };
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [root, selectedPath]);
+  }, [root, path]);
 
   return (
     <div style={{ color: colors.text, backgroundColor: colors.background }}>
@@ -71,7 +26,7 @@ function App() {
         width={dimensions.width}
         height={dimensions.height}
       >
-        {selectionBox(root, selectedPath)}
+        {selectionBox(root, path)}
         {itemView(root, root, [])}
       </svg>
     </div>
@@ -151,7 +106,7 @@ const spacings = {
 };
 
 const colors = {
-  selectionColor: "rgb(42,45,46)",
+  selectionColor: "rgb(113,116,127,0.2)",
   background: "#0B101C",
   text: "white",
   circle: "white",
