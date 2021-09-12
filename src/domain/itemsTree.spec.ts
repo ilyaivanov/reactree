@@ -10,7 +10,7 @@ const root = tree.createItem("Root", [
       /*3*/ tree.createItem("Item 7"),
     ]),
   ]),
-  /*8*/ tree.createItem("Item 9"),
+  /*8*/ tree.createItem("Item 8"),
 ]);
 
 it("item offset for the first root child is 1", () =>
@@ -79,6 +79,38 @@ it("updating title of an item at wrong path [1, 1, 2, 66] throws an error", () =
           ^^
 Check children of an item Item 7`);
   expect(action).toThrow(error);
+});
+
+//Tree traversal
+//  1
+//  2
+//    3
+//    4
+//      5
+//      6
+//      7
+//  8
+
+describe("item below", () => {
+  it("[] is [0]", () => expect(tree.getItemBelow(root, [])).toEqual([0]));
+
+  it("[0] is [1] (item at [0] is empty)", () =>
+    expect(tree.getItemBelow(root, [0])).toEqual([1]));
+
+  it("[1] is [1, 0] (item at [1] is open)", () =>
+    expect(tree.getItemBelow(root, [1])).toEqual([1, 0]));
+
+  it("[1, 0] is [1, 1] (item at [1, 0] is empty)", () =>
+    expect(tree.getItemBelow(root, [1, 0])).toEqual([1, 1]));
+
+  it("[1, 1] is [1, 1, 0] (item at [1, 1] is open)", () =>
+    expect(tree.getItemBelow(root, [1, 0])).toEqual([1, 1]));
+
+  it("[1, 1, 0] is [1, 1, 1] (item at [1, 1, 0] is empty)", () =>
+    expect(tree.getItemBelow(root, [1, 1, 0])).toEqual([1, 1, 1]));
+
+  it("[1, 1, 2] is [2] (item at [1, 1, 2] is a last child, thus parents are traversed to find next item)", () =>
+    expect(tree.getItemBelow(root, [1, 1, 2])).toEqual([2]));
 });
 
 //get item at path DONE

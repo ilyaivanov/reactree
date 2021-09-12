@@ -73,14 +73,37 @@ export const updateItemByPath = (
 export const getPathPositionFromRoot = (root: Item, path: Path) => {
   let currentPath = [];
   let offset = 0;
-  while (currentPath.length != path.length) {
+  while (currentPath.length !== path.length) {
     currentPath.push(path[currentPath.length]);
     offset += getItemOffsetFromParent(getItemAtPath(root, currentPath));
   }
   return offset;
 };
 
+export const getItemBelow = (root: Item, path: Path): Path => {
+  const item = getItemAtPath(root, path);
+  if (item.isOpen) return [...path, 0];
+  else {
+    let nonLastParent = path;
+    while (isLastItem(root, nonLastParent)) {
+      nonLastParent = removeLast(nonLastParent);
+    }
+
+    return updateArrayAtIndex(
+      nonLastParent,
+      nonLastParent.length - 1,
+      (a) => a + 1
+    );
+  }
+};
+
 //item utils
+
+const isLastItem = (root: Item, path: Path): boolean => {
+  const [rest, lastItem] = pop(path);
+  const item = getItemAtPath(root, rest);
+  return item.children.length - 1 === lastItem;
+};
 
 const updateItemChildAt = (
   item: Item,
@@ -102,8 +125,12 @@ const updateArrayAtIndex = <T>(
   return newArray;
 };
 
-//non-mutative shift
+//non-mutative array ops
 const shift = <T>(arr: T[]): [T, T[]] => [arr[0], arr.slice(1)];
+
+const pop = <T>(arr: T[]): [T[], T] => [removeLast(arr), arr[arr.length - 1]];
+
+const removeLast = <T>(arr: T[]): T[] => arr.slice(0, arr.length - 1);
 
 //Error handling
 const throwPathLookupError = (
