@@ -1,9 +1,9 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useState } from "react";
 import "./App.css";
 import * as tree from "./domain/itemsTree";
 import { useWindowSize } from "./infra/useWindowDimensions";
 
-const root = tree.createItem("Root", [
+const rootItem = tree.createItem("Root", [
   tree.createItem("Item 1"),
   tree.createItem("Item 2", [
     tree.createItem("Item 3"),
@@ -14,7 +14,9 @@ const root = tree.createItem("Root", [
 ]);
 
 function App() {
-  const [tree, dispatch] = useReducer((x) => x, root);
+  const [root, dispatch] = useReducer((x) => x, rootItem);
+  const [selectedItemPath] = useState([0]);
+
   const dimensions = useWindowSize();
   return (
     <div style={{ color: colors.text, backgroundColor: colors.background }}>
@@ -24,7 +26,7 @@ function App() {
         height={dimensions.height}
       >
         {selectionBox()}
-        {itemView(tree)}
+        {itemView(root)}
       </svg>
     </div>
   );
@@ -93,7 +95,7 @@ const spacings = {
   xStep: 20,
   yStep: 20,
   circleRadius: 5,
-  circleBorder: 2,
+  circleBorder: 3.5,
   circleToTextDistance: 5,
 };
 
