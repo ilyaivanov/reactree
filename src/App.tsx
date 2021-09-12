@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import * as tree from "./domain/itemsTree";
 import { useWindowSize } from "./infra/useWindowDimensions";
@@ -12,6 +12,17 @@ const rootItem = tree.createItem("Root", [
   ]),
   tree.createItem("Item 6"),
 ]);
+
+const randomInt = (from: number, to: number) =>
+  Math.floor(from + Math.random() * (to - from));
+
+const randomItems = (): Item[] =>
+  Array.from(new Array(randomInt(5, 10))).map((a, i) => ({
+    id: "rid_" + Math.random(),
+    title: "Random Item " + i + 1,
+    children: [],
+    isOpen: false,
+  }));
 
 function App() {
   const [root, setRoot] = useState(rootItem);
@@ -38,7 +49,13 @@ function App() {
           setRoot(tree.updateItemByPath(root, selectedPath, tree.openItem));
         else if (item.children.length > 0) setPath((p) => [...p, 0]);
         else {
-          //load and append
+          setRoot(
+            tree.updateItemByPath(root, selectedPath, (i) => ({
+              ...i,
+              isOpen: true,
+              children: randomItems(),
+            }))
+          );
         }
       }
     };
