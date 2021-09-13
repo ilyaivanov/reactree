@@ -12,57 +12,82 @@ const rootItem = tree.createItem("Root", [
   tree.createItem("Item 6"),
 ]);
 
-type Action = "moveDown" | "moveUp" | "moveLeft" | "moveRight";
+type PlainAction<T> = { type: T };
 
-const updatePath = (state: State, path: tree.Path): State => ({
-  path,
-  root: state.root,
-});
+type Action =
+  | PlainAction<"move-down">
+  | PlainAction<"move-up">
+  | PlainAction<"move-left">
+  | PlainAction<"move-right">
+  | PlainAction<"start-edit">
+  | {
+      type: "finish-rename";
+      path: tree.Path;
+      newTitle: string;
+    };
 
-const updateRoot = (state: State, root: Item): State => ({
-  root,
-  path: state.path,
-});
+const reducer = (state: State, action: Action): State => {
+  // console.log(`Dispatching ${action.type}`);
+  const updatePath = (path: tree.Path): State => ({
+    path,
+    root: state.root,
+  });
 
-const dispatch = (state: State, action: Action): State => {
-  if (action === "moveDown")
-    return updatePath(state, tree.getItemBelow(state.root, state.path));
-  if (action === "moveUp")
-    return updatePath(state, tree.getItemAbove(state.root, state.path));
+  const updateRoot = (root: Item): State => ({
+    root,
+    path: state.path,
+  });
 
-  if (action === "moveLeft") {
+  if (action.type === "move-down")
+    return updatePath(tree.getItemBelow(state.root, state.path));
+  else if (action.type === "move-up")
+    return updatePath(tree.getItemAbove(state.root, state.path));
+  else if (action.type === "move-left") {
     const item = tree.getItemAtPath(state.root, state.path);
     return item.isOpen
       ? updateRoot(
-          state,
           tree.updateItemByPath(state.root, state.path, tree.closeItem)
         )
-      : updatePath(state, tree.getPathParent(state.path));
-  }
-  if (action === "moveRight") {
+      : updatePath(tree.getPathParent(state.path));
+  } else if (action.type === "move-right") {
     const item = tree.getItemAtPath(state.root, state.path);
     if (!item.isOpen && item.children.length > 0)
       return updateRoot(
-        state,
         tree.updateItemByPath(state.root, state.path, tree.openItem)
       );
-    else if (item.children.length > 0)
-      return updatePath(state, [...state.path, 0]);
+    else if (item.children.length > 0) return updatePath([...state.path, 0]);
     else
       return updateRoot(
-        state,
         tree.updateItemByPath(state.root, state.path, (i) => ({
           ...i,
           isOpen: true,
           children: randomItems(),
         }))
       );
+  } else if (action.type === "start-edit") {
+    return updateRoot(
+      tree.updateItemByPath(state.root, state.path, (i) => ({
+        ...i,
+        isEditing: true,
+      }))
+    );
+  } else if (action.type === "finish-rename") {
+    return updateRoot(
+      tree.updateItemByPath(state.root, action.path, (i) => ({
+        ...i,
+        title: action.newTitle,
+        isEditing: false,
+      }))
+    );
   }
 
+  exhaustCheck(action);
   return state;
 };
 
-type Dispatch = (action: Action) => void;
+const exhaustCheck = (a: never): never => a;
+
+export type Dispatch = (action: Action) => void;
 type State = { root: Item; path: tree.Path };
 
 const randomItems = (): Item[] =>
@@ -73,5 +98,7 @@ const randomItems = (): Item[] =>
     isOpen: false,
   }));
 
-export const useItems = (): [State, Dispatch] =>
-  useReducer(dispatch, { root: rootItem, path: [0] });
+export const useItems = (): [State, Dispatch] => {
+  const [state, dispatch] = useReducer(reducer, { root: rootItem, path: [0] });
+  return [state, dispatch];
+};

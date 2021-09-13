@@ -3,4 +3,5 @@ type Item = {
   title: string;
   children: Item[];
   isOpen: boolean;
+  isEditing?: boolean;
 };

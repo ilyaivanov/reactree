@@ -1,11 +1,13 @@
 import { Component } from "react";
 import { colors, spacings } from "../designSystem";
 import * as tree from "../domain/itemsTree";
+import { Dispatch } from "../useItems";
 
 type ItemViewProps = {
   item: Item;
   path: tree.Path;
   parent?: Item;
+  dispatch: Dispatch;
 };
 
 export class ItemView extends Component<ItemViewProps> {
@@ -16,8 +18,57 @@ export class ItemView extends Component<ItemViewProps> {
     );
   }
 
+  renderText = () => {
+    const { item, dispatch } = this.props;
+    if (this.props.item.isEditing)
+      return (
+        <foreignObject x={10} y={-12} height={spacings.yStep} width={2000}>
+          <input
+            className="my-input"
+            autoFocus
+            defaultValue={this.props.item.title}
+            onBlur={(e) => {
+              dispatch({
+                type: "finish-rename",
+                path: this.props.path,
+                newTitle: e.currentTarget.value,
+              });
+            }}
+            onKeyDown={(e) => {
+              if (
+                e.key === "ArrowUp" ||
+                e.key === "ArrowDown" ||
+                e.key === "Enter" ||
+                e.key === "Escape"
+              ) {
+                dispatch({
+                  type: "finish-rename",
+                  path: this.props.path,
+                  newTitle: e.currentTarget.value,
+                });
+              } else {
+                e.stopPropagation();
+              }
+            }}
+          />
+        </foreignObject>
+      );
+    else
+      return (
+        <text
+          x={spacings.circleRadius + spacings.circleToTextDistance}
+          dy="0.32em"
+          fill="currentColor"
+          style={{ whiteSpace: "pre" }}
+          fontSize={14}
+        >
+          {item.title}
+        </text>
+      );
+  };
+
   render() {
-    const { parent, item, path } = this.props;
+    const { parent, item, path, dispatch } = this.props;
     const y = parent
       ? tree.getItemOffsetFromParent(parent, item) * spacings.yStep
       : spacings.gap;
@@ -37,14 +88,7 @@ export class ItemView extends Component<ItemViewProps> {
           strokeWidth={spacings.circleBorder}
         ></circle>
 
-        <text
-          x={spacings.circleRadius + spacings.circleToTextDistance}
-          dy="0.32em"
-          fill="currentColor"
-          fontSize={14}
-        >
-          {item.title}
-        </text>
+        {this.renderText()}
         <g>
           {item.isOpen &&
             item.children.map((child, index) => (
@@ -52,6 +96,7 @@ export class ItemView extends Component<ItemViewProps> {
                 key={child.id}
                 parent={item}
                 item={child}
+                dispatch={dispatch}
                 path={[...path, index]}
               />
             ))}

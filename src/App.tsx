@@ -14,14 +14,15 @@ const openItemsCount = (item: Item): number => {
 
 function App() {
   const [{ root, path }, dispatch] = useItems();
-  const dimensions = useWindowSize();
+  const windowSize = useWindowSize();
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "ArrowDown") dispatch("moveDown");
-      if (e.code === "ArrowUp") dispatch("moveUp");
-      if (e.code === "ArrowLeft") dispatch("moveLeft");
-      if (e.code === "ArrowRight") dispatch("moveRight");
+      if (e.code === "ArrowDown") dispatch({ type: "move-down" });
+      if (e.code === "ArrowUp") dispatch({ type: "move-up" });
+      if (e.code === "ArrowLeft") dispatch({ type: "move-left" });
+      if (e.code === "ArrowRight") dispatch({ type: "move-right" });
+      if (e.code === "Space") dispatch({ type: "start-edit" });
     };
 
     document.addEventListener("keydown", onKeyDown);
@@ -32,17 +33,17 @@ function App() {
   return (
     <div style={{ color: colors.text, backgroundColor: colors.background }}>
       <Scrollbar
-        windowHeight={dimensions.height}
+        windowHeight={windowSize.height}
         contentHeight={itemsCount * spacings.yStep + 2 * spacings.gap}
       >
         {(windowOffset) => (
           <svg
-            viewBox={`0 ${windowOffset} ${dimensions.width} ${dimensions.height}`}
-            width={dimensions.width}
-            height={dimensions.height}
+            viewBox={`0 ${windowOffset} ${windowSize.width} ${windowSize.height}`}
+            width={windowSize.width}
+            height={windowSize.height}
           >
-            <SelectionBox root={root} path={path} />
-            <ItemView item={root} path={[]} />
+            <SelectionBox root={root} path={path} width={windowSize.width} />
+            <ItemView item={root} path={[]} dispatch={dispatch} />
           </svg>
         )}
       </Scrollbar>
@@ -54,16 +55,17 @@ function App() {
 type SelectionBoxProps = {
   root: Item;
   path: tree.Path;
+  width: number;
 };
 
 const SelectionBox = memo((props: SelectionBoxProps) => {
-  const { root, path } = props;
+  const { root, path, width } = props;
   const { gap, yStep } = spacings;
   return (
     <rect
       x="0"
       y={gap + yStep * tree.getPathPositionFromRoot(root, path) - yStep / 2}
-      width={window.innerWidth}
+      width={width}
       height={yStep}
       fill={colors.selectionColor}
     />
