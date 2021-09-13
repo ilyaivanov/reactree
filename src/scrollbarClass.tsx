@@ -7,31 +7,38 @@ type Props = {
   children: (xOffset: number) => JSX.Element;
 };
 type State = {
-  thumbOffset: number;
+  windowOffset: number;
   mouseOffsetOnMouseDown: number | undefined;
 };
 
 //Handles mouseWheel and scroll thumb drag events
 export class Scrollbar extends React.Component<Props, State> {
   state = {
-    thumbOffset: 0,
+    windowOffset: 0,
     mouseOffsetOnMouseDown: undefined,
+  };
+
+  thumbOffset = () => {
+    const { contentHeight, windowHeight } = this.props;
+    const { windowOffset } = this.state;
+
+    return (windowOffset * windowHeight) / contentHeight;
   };
 
   thumbHeight = () =>
     (this.props.windowHeight * this.props.windowHeight) /
     this.props.contentHeight;
 
-  setThumbOffset = (setter: (currentOffset: number) => number) => {
-    const maxvalue = this.props.windowHeight - this.thumbHeight();
+  setWindowOffset = (setter: (currentOffset: number) => number) => {
+    const maxvalue = this.props.contentHeight - this.props.windowHeight;
     this.setState((state) => ({
-      thumbOffset: clamp(setter(state.thumbOffset), 0, maxvalue),
+      windowOffset: clamp(setter(state.windowOffset), 0, maxvalue),
     }));
   };
 
   onThumbMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     this.setState({
-      mouseOffsetOnMouseDown: e.clientY - this.state.thumbOffset,
+      mouseOffsetOnMouseDown: e.clientY - this.thumbOffset(),
     });
     document.addEventListener("mousemove", this.onDocumentMouseMove);
     document.addEventListener("mouseup", this.onDocumentMouseUp);
@@ -43,9 +50,14 @@ export class Scrollbar extends React.Component<Props, State> {
   };
 
   onDocumentMouseMove = (e: MouseEvent) =>
-    this.setThumbOffset((offset) => offset + e.movementY);
+    this.setWindowOffset(
+      (offset) =>
+        offset +
+        e.movementY * (this.props.contentHeight / this.props.windowHeight)
+    );
 
   componentDidMount() {
+    //wheel events should be attached to svg container
     document.addEventListener("wheel", this.onMouseWheel);
   }
 
@@ -56,17 +68,13 @@ export class Scrollbar extends React.Component<Props, State> {
   onMouseWheel = (e: WheelEvent) => {
     const { contentHeight, windowHeight } = this.props;
     if (contentHeight > windowHeight)
-      this.setThumbOffset((offset) => {
-        const delta = e.deltaY * (windowHeight / contentHeight);
-        return offset + delta;
-      });
+      this.setWindowOffset((offset) => offset + e.deltaY);
   };
 
   render() {
     const { contentHeight, windowHeight, children } = this.props;
-    const { thumbOffset } = this.state;
+    const { windowOffset } = this.state;
 
-    const windowOffset = (thumbOffset * contentHeight) / windowHeight;
     return (
       <div className="scrollbar">
         {children(windowOffset)}
@@ -74,7 +82,7 @@ export class Scrollbar extends React.Component<Props, State> {
           <div
             className="scrollThumb"
             onMouseDown={this.onThumbMouseDown}
-            style={{ height: this.thumbHeight(), top: thumbOffset }}
+            style={{ height: this.thumbHeight(), top: this.thumbOffset() }}
           />
         )}
       </div>

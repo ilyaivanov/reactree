@@ -22,12 +22,16 @@ svg {
   width: 15px;
   background-color: #424242;
   cursor: pointer;
-  transition: background-color 200ms;
+  transition: background-color 100ms;
   user-select: none;
 }
 
 .scrollThumb:hover {
   background-color: #4f4f4f;
+}
+
+.scrollThumb:active {
+  background-color: #5e5e5e;
 }
 
 .itemsCountLabel {
