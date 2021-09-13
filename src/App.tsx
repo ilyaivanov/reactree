@@ -23,6 +23,8 @@ function App() {
       if (e.code === "ArrowLeft") dispatch({ type: "move-left" });
       if (e.code === "ArrowRight") dispatch({ type: "move-right" });
       if (e.code === "Space") dispatch({ type: "start-edit" });
+      if (e.code === "Backspace" && e.shiftKey && e.ctrlKey)
+        dispatch({ type: "remove-selected" });
     };
 
     document.addEventListener("keydown", onKeyDown);

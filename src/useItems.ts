@@ -19,6 +19,7 @@ type Action =
   | PlainAction<"move-left">
   | PlainAction<"move-right">
   | PlainAction<"start-edit">
+  | PlainAction<"remove-selected">
   | {
       type: "finish-rename";
       path: tree.Path;
@@ -78,6 +79,17 @@ const reducer = (state: State, action: Action): State => {
         isEditing: false,
       }))
     );
+  } else if (action.type === "remove-selected") {
+    if (tree.isPathRoot(state.path)) return state;
+    const item = tree.getItemAtPath(state.root, state.path);
+    const parentPath = tree.getPathParent(state.path);
+    return {
+      root: tree.updateItemByPath(state.root, parentPath, (i) => ({
+        ...i,
+        children: i.children.filter((child) => child != item),
+      })),
+      path: tree.getItemAbove(state.root, state.path),
+    };
   }
 
   exhaustCheck(action);
