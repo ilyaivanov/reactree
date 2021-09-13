@@ -42,7 +42,7 @@ function App() {
             height={dimensions.height}
           >
             <SelectionBox root={root} path={path} />
-            <ItemView root={root} item={root} path={[]} />
+            <ItemView item={root} path={[]} />
           </svg>
         )}
       </Scrollbar>
@@ -55,6 +55,7 @@ type SelectionBoxProps = {
   root: Item;
   path: tree.Path;
 };
+
 const SelectionBox = memo((props: SelectionBoxProps) => {
   const { root, path } = props;
   const { gap, yStep } = spacings;

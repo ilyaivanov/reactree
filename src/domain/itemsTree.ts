@@ -7,20 +7,15 @@ export const createItem = (title: string, children?: Item[]): Item => ({
   children: children || [],
 });
 
-export const getItemOffsetFromParent = (root: Item, path: Path) => {
-  if (isPathRoot(path)) return 0;
-  else {
-    const getChildrenCountIncludingSelf = (item: Item): number => {
-      if (item.isOpen)
-        return 1 + sumBy(item.children, getChildrenCountIncludingSelf);
-      else return 1;
-    };
-    const parent = getItemAtPath(root, array.removeLast(path));
-    const item = getItemAtPath(root, path);
-    const context = parent.children;
-    const index = context.indexOf(item);
-    return 1 + sumBy(context.slice(0, index), getChildrenCountIncludingSelf);
-  }
+export const getItemOffsetFromParent = (parent: Item, item: Item) => {
+  const getChildrenCountIncludingSelf = (child: Item): number => {
+    if (child.isOpen)
+      return 1 + sumBy(child.children, getChildrenCountIncludingSelf);
+    else return 1;
+  };
+  const context = parent.children;
+  const index = context.indexOf(item);
+  return 1 + sumBy(context.slice(0, index), getChildrenCountIncludingSelf);
 };
 
 export type Path = number[];
@@ -64,9 +59,12 @@ export const updateItemByPath = (
 export const getPathPositionFromRoot = (root: Item, path: Path) => {
   let currentPath = [];
   let offset = 0;
+  let parent = root;
   while (currentPath.length !== path.length) {
     currentPath.push(path[currentPath.length]);
-    offset += getItemOffsetFromParent(root, currentPath);
+    const item = getItemAtPath(root, currentPath);
+    offset += getItemOffsetFromParent(parent, item);
+    parent = item;
   }
   return offset;
 };

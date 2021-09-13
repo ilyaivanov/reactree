@@ -14,13 +14,13 @@ const root = tree.createItem("Root", [
 ]);
 
 it("item offset for the first root child is 1", () =>
-  expect(tree.getItemOffsetFromParent(root, [0])).toEqual(1));
+  expect(tree.getItemOffsetFromParent(root, root.children[0])).toEqual(1));
 
 it("item offset for the second root child is 2", () =>
-  expect(tree.getItemOffsetFromParent(root, [1])).toEqual(2));
+  expect(tree.getItemOffsetFromParent(root, root.children[1])).toEqual(2));
 
 it("item offset for the third root child is 8 (second child is open and it affect position of the third)", () =>
-  expect(tree.getItemOffsetFromParent(root, [2])).toEqual(8));
+  expect(tree.getItemOffsetFromParent(root, root.children[2])).toEqual(8));
 
 it("get item at path [] is a root item", () =>
   expect(tree.getItemAtPath(root, []).title).toEqual("Root"));
@@ -143,8 +143,8 @@ describe("item above", () => {
 
 describe("regressions", () => {
   it("closing second item should not change parent offset for that item", () => {
-    expect(tree.getItemOffsetFromParent(root, [1])).toBe(2);
-    const f1 = tree.updateItemByPath(root, [1], tree.closeItem);
-    expect(tree.getItemOffsetFromParent(f1, [1])).toBe(2);
+    expect(tree.getItemOffsetFromParent(root, root.children[1])).toBe(2);
+    const newRoot = tree.updateItemByPath(root, [1], tree.closeItem);
+    expect(tree.getItemOffsetFromParent(newRoot, newRoot.children[1])).toBe(2);
   });
 });
