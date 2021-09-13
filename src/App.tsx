@@ -1,7 +1,14 @@
 import { useEffect } from "react";
 import * as tree from "./domain/itemsTree";
 import { useWindowSize } from "./infra/useWindowDimensions";
+import { Scrollbar } from "./scrollbar";
 import { useItems } from "./useItems";
+
+const calculateContentHeightLongCalculation = (item: Item): number => {
+  let count = 0;
+  tree.forEachVisibleChild(item, () => (count += 1));
+  return count * spacings.yStep + 2 * spacings.gap;
+};
 
 function App() {
   const [{ root, path }, dispatch] = useItems();
@@ -17,18 +24,25 @@ function App() {
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [root, path]);
+  }, [root, path, dispatch]);
 
   return (
     <div style={{ color: colors.text, backgroundColor: colors.background }}>
-      <svg
-        viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
-        width={dimensions.width}
-        height={dimensions.height}
+      <Scrollbar
+        windowHeight={dimensions.height}
+        contentHeight={calculateContentHeightLongCalculation(root)}
       >
-        {selectionBox(root, path)}
-        {itemView(root, root, [])}
-      </svg>
+        {(windowOffset) => (
+          <svg
+            viewBox={`0 ${windowOffset} ${dimensions.width} ${dimensions.height}`}
+            width={dimensions.width}
+            height={dimensions.height}
+          >
+            {selectionBox(root, path)}
+            {itemView(root, root, [])}
+          </svg>
+        )}
+      </Scrollbar>
     </div>
   );
 }

@@ -10,3 +10,22 @@ body {
 svg {
   display: block;
 }
+
+.scrollbar {
+  height: 100vh;
+  width: 100vw;
+}
+
+.scrollThumb {
+  position: absolute;
+  right: 0;
+  width: 15px;
+  background-color: #424242;
+  cursor: pointer;
+  transition: background-color 200ms;
+  user-select: none;
+}
+
+.scrollThumb:hover {
+  background-color: #4f4f4f;
+}

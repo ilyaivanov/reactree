@@ -1,5 +1,6 @@
 import { useReducer } from "react";
 import * as tree from "./domain/itemsTree";
+import { randomInt } from "./domain/number";
 
 const rootItem = tree.createItem("Root", [
   tree.createItem("Item 1"),
@@ -10,9 +11,6 @@ const rootItem = tree.createItem("Root", [
   ]),
   tree.createItem("Item 6"),
 ]);
-
-const randomInt = (from: number, to: number) =>
-  Math.floor(from + Math.random() * (to - from));
 
 type Action = "moveDown" | "moveUp" | "moveLeft" | "moveRight";
 
@@ -67,9 +65,6 @@ const dispatch = (state: State, action: Action): State => {
 type Dispatch = (action: Action) => void;
 type State = { root: Item; path: tree.Path };
 
-export const useItems = (): [State, Dispatch] =>
-  useReducer(dispatch, { root: rootItem, path: [0] });
-
 const randomItems = (): Item[] =>
   Array.from(new Array(randomInt(5, 20))).map((_, i) => ({
     id: "rid_" + Math.random(),
@@ -77,3 +72,6 @@ const randomItems = (): Item[] =>
     children: [],
     isOpen: false,
   }));
+
+export const useItems = (): [State, Dispatch] =>
+  useReducer(dispatch, { root: rootItem, path: [0] });

@@ -116,6 +116,18 @@ export const getPathParent = (path: Path): Path => {
 
 export const isPathRoot = (path: Path) => path.length === 0;
 
+export const forEachVisibleChild = (
+  item: Item,
+  action: (child: Item) => void
+) => {
+  if (item.isOpen) {
+    item.children.forEach((i) => {
+      action(i);
+      forEachVisibleChild(i, action);
+    });
+  }
+};
+
 const isLastItem = (root: Item, path: Path): boolean => {
   const [rest, lastItem] = array.pop(path);
   const item = getItemAtPath(root, rest);
