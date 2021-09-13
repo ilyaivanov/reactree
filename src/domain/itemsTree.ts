@@ -1,4 +1,5 @@
 import * as array from "./array";
+import { randomInt } from "./number";
 
 export const createItem = (title: string, children?: Item[]): Item => ({
   id: "id_" + Math.random(),
@@ -125,6 +126,14 @@ export const forEachVisibleChild = (
     });
   }
 };
+
+export const randomItems = (): Item[] =>
+  Array.from(new Array(randomInt(5, 20))).map((_, i) => ({
+    id: "rid_" + Math.random(),
+    title: "Random Item " + (i + 1),
+    children: [],
+    isOpen: false,
+  }));
 
 const isLastItem = (root: Item, path: Path): boolean => {
   const [rest, lastItem] = array.pop(path);

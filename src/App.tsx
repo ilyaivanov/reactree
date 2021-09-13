@@ -1,7 +1,7 @@
 import { memo, useEffect } from "react";
 import * as tree from "./domain/itemsTree";
 import { useWindowSize } from "./infra/useWindowDimensions";
-import { Scrollbar } from "./scrollbarClass";
+import { Scrollbar } from "./scrollbar";
 import { ItemView } from "./tree/ItemView";
 import { useItems } from "./useItems";
 import { colors, spacings } from "./designSystem";

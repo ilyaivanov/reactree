@@ -1,6 +1,5 @@
 import { useReducer } from "react";
 import * as tree from "./domain/itemsTree";
-import { randomInt } from "./domain/number";
 
 const rootItem = tree.createItem("Root", [
   tree.createItem("Item 1"),
@@ -61,7 +60,7 @@ const reducer = (state: State, action: Action): State => {
         tree.updateItemByPath(state.root, state.path, (i) => ({
           ...i,
           isOpen: true,
-          children: randomItems(),
+          children: tree.randomItems(),
         }))
       );
   } else if (action.type === "start-edit") {
@@ -89,14 +88,6 @@ const exhaustCheck = (a: never): never => a;
 
 export type Dispatch = (action: Action) => void;
 type State = { root: Item; path: tree.Path };
-
-const randomItems = (): Item[] =>
-  Array.from(new Array(randomInt(5, 20))).map((_, i) => ({
-    id: "rid_" + Math.random(),
-    title: "Random Item " + (i + 1),
-    children: [],
-    isOpen: false,
-  }));
 
 export const useItems = (): [State, Dispatch] => {
   const [state, dispatch] = useReducer(reducer, { root: rootItem, path: [0] });
