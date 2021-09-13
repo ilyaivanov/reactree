@@ -37,11 +37,13 @@ svg {
 
 .itemsCountLabel {
   position: fixed;
-  top: 20px;
-  right: 40px;
-  background-color: #424242;
-  border-radius: 6px;
-  padding: 5px;
+  left: 0px;
+  width: 20px;
+  text-align: center;
+  top: calc(50vh - 10px);
+  color: gray;
+  font-weight: bold;
+  transform: rotateZ(-90deg);
 }
 
 .my-input {

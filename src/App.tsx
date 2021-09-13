@@ -34,6 +34,7 @@ function App() {
   const itemsCount = openItemsCount(root);
   return (
     <div style={{ color: colors.text, backgroundColor: colors.background }}>
+      <div className="itemsCountLabel">{itemsCount}</div>
       <Scrollbar
         windowHeight={windowSize.height}
         contentHeight={itemsCount * spacings.yStep + 2 * spacings.gap}
@@ -49,7 +50,6 @@ function App() {
           </svg>
         )}
       </Scrollbar>
-      <div className="itemsCountLabel">Items Count: {itemsCount}</div>
     </div>
   );
 }
