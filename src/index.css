@@ -29,3 +29,12 @@ svg {
 .scrollThumb:hover {
   background-color: #4f4f4f;
 }
+
+.itemsCountLabel {
+  position: fixed;
+  top: 20px;
+  right: 40px;
+  background-color: #424242;
+  border-radius: 6px;
+  padding: 5px;
+}
