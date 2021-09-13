@@ -22,7 +22,13 @@ function App() {
       if (e.code === "ArrowUp") dispatch({ type: "move-up" });
       if (e.code === "ArrowLeft") dispatch({ type: "move-left" });
       if (e.code === "ArrowRight") dispatch({ type: "move-right" });
-      if (e.code === "Space") dispatch({ type: "start-edit" });
+      if (e.code === "KeyE") {
+        //prevenring onInput event for input tag while entering edit mode
+        e.preventDefault();
+        dispatch({ type: "start-edit" });
+      }
+      if (e.code === "Enter")
+        dispatch({ type: "create-new-item-after-selected" });
       if (e.code === "Backspace" && e.shiftKey && e.ctrlKey)
         dispatch({ type: "remove-selected" });
     };

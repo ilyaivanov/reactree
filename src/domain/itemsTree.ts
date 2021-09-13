@@ -8,6 +8,14 @@ export const createItem = (title: string, children?: Item[]): Item => ({
   children: children || [],
 });
 
+export const createNewItem = (): Item => ({
+  id: "rid_" + Math.random(),
+  title: "New Item",
+  children: [],
+  isOpen: false,
+  isEditing: true,
+});
+
 export const getItemOffsetFromParent = (parent: Item, item: Item) => {
   const getChildrenCountIncludingSelf = (child: Item): number => {
     if (child.isOpen)

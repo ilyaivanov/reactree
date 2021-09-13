@@ -1,5 +1,6 @@
 import { useReducer } from "react";
 import * as tree from "./domain/itemsTree";
+import * as array from "./domain/array";
 
 const rootItem = tree.createItem("Root", [
   tree.createItem("Item 1"),
@@ -20,6 +21,7 @@ type Action =
   | PlainAction<"move-right">
   | PlainAction<"start-edit">
   | PlainAction<"remove-selected">
+  | PlainAction<"create-new-item-after-selected">
   | {
       type: "finish-rename";
       path: tree.Path;
@@ -89,6 +91,20 @@ const reducer = (state: State, action: Action): State => {
         children: i.children.filter((child) => child != item),
       })),
       path: tree.getItemAbove(state.root, state.path),
+    };
+  } else if (action.type === "create-new-item-after-selected") {
+    if (tree.isPathRoot(state.path)) return state;
+
+    const itemIndex = array.lastItem(state.path);
+    const nextPath = array.updateLastItem(state.path, (p) => p + 1);
+    const parentPath = tree.getPathParent(state.path);
+    const newItem = tree.createNewItem();
+    return {
+      root: tree.updateItemByPath(state.root, parentPath, (i) => ({
+        ...i,
+        children: array.insertAt(i.children, itemIndex + 1, newItem),
+      })),
+      path: nextPath,
     };
   }
 

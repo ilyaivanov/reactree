@@ -21,3 +21,11 @@ export const pop = <T>(arr: T[]): [T[], T] => [
 export const removeLast = <T>(arr: T[]): T[] => arr.slice(0, arr.length - 1);
 
 export const lastItemIndex = (arr: unknown[]): number => arr.length - 1;
+export const lastItem = <T>(arr: T[]): T => arr[arr.length - 1];
+
+export const insertAt = <T>(arr: T[], index: number, item: T): T[] => {
+  console.log("insertAt");
+  const copy = [...arr];
+  copy.splice(index, 0, item);
+  return copy;
+};

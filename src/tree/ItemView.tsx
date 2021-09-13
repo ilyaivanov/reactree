@@ -34,6 +34,7 @@ export class ItemView extends Component<ItemViewProps> {
                 newTitle: e.currentTarget.value,
               });
             }}
+            onFocus={(e) => e.currentTarget.setSelectionRange(0, 2000)}
             onKeyDown={(e) => {
               if (
                 e.key === "ArrowUp" ||
@@ -41,6 +42,8 @@ export class ItemView extends Component<ItemViewProps> {
                 e.key === "Enter" ||
                 e.key === "Escape"
               ) {
+                //avoid creating new item on enter during edit
+                if (e.key === "Enter") e.stopPropagation();
                 dispatch({
                   type: "finish-rename",
                   path: this.props.path,
