@@ -1,6 +1,8 @@
 import { useReducer } from "react";
-import * as tree from "./domain/itemsTree";
-import * as array from "./domain/array";
+import * as tree from "../../domain/itemsTree";
+import * as treeOperations from "../../domain/createRemoveRename";
+import { array } from "../../domain/primitives";
+import * as movement from "../../domain/movement";
 
 const rootItem = tree.createItem("Root", [
   tree.createItem("Item 1"),
@@ -22,20 +24,24 @@ type Action =
   | PlainAction<"start-edit">
   | PlainAction<"remove-selected">
   | PlainAction<"create-new-item-after-selected">
+  | PlainAction<"selection/moveRight">
+  | PlainAction<"selection/moveLeft">
+  | PlainAction<"movement/moveDown">
+  | PlainAction<"movement/moveUp">
   | {
       type: "finish-rename";
-      path: tree.Path;
+      path: Path;
       newTitle: string;
     };
 
-const reducer = (state: State, action: Action): State => {
+const reducer = (state: AppState, action: Action): AppState => {
   // console.log(`Dispatching ${action.type}`);
-  const updatePath = (path: tree.Path): State => ({
+  const updatePath = (path: Path): AppState => ({
     path,
     root: state.root,
   });
 
-  const updateRoot = (root: Item): State => ({
+  const updateRoot = (root: Item): AppState => ({
     root,
     path: state.path,
   });
@@ -58,14 +64,7 @@ const reducer = (state: State, action: Action): State => {
         tree.updateItemByPath(state.root, state.path, tree.openItem)
       );
     else if (item.children.length > 0) return updatePath([...state.path, 0]);
-    else
-      return updateRoot(
-        tree.updateItemByPath(state.root, state.path, (i) => ({
-          ...i,
-          isOpen: true,
-          children: tree.randomItems(),
-        }))
-      );
+    else return state;
   } else if (action.type === "start-edit") {
     return updateRoot(
       tree.updateItemByPath(state.root, state.path, (i) => ({
@@ -82,16 +81,7 @@ const reducer = (state: State, action: Action): State => {
       }))
     );
   } else if (action.type === "remove-selected") {
-    if (tree.isPathRoot(state.path)) return state;
-    const item = tree.getItemAtPath(state.root, state.path);
-    const parentPath = tree.getPathParent(state.path);
-    return {
-      root: tree.updateItemByPath(state.root, parentPath, (i) => ({
-        ...i,
-        children: i.children.filter((child) => child != item),
-      })),
-      path: tree.getItemAbove(state.root, state.path),
-    };
+    return treeOperations.removeSelectedItem(state);
   } else if (action.type === "create-new-item-after-selected") {
     if (tree.isPathRoot(state.path)) return state;
 
@@ -106,6 +96,14 @@ const reducer = (state: State, action: Action): State => {
       })),
       path: nextPath,
     };
+  } else if (action.type === "selection/moveLeft")
+    return movement.moveItemLeft(state);
+  else if (action.type === "selection/moveRight")
+    return movement.moveItemRight(state);
+  else if (action.type === "movement/moveDown")
+    return movement.moveItemDown(state);
+  else if (action.type === "movement/moveUp") {
+    return movement.moveItemUp(state);
   }
 
   exhaustCheck(action);
@@ -115,9 +113,8 @@ const reducer = (state: State, action: Action): State => {
 const exhaustCheck = (a: never): never => a;
 
 export type Dispatch = (action: Action) => void;
-type State = { root: Item; path: tree.Path };
 
-export const useItems = (): [State, Dispatch] => {
+export const useItems = (): [AppState, Dispatch] => {
   const [state, dispatch] = useReducer(reducer, { root: rootItem, path: [0] });
   return [state, dispatch];
 };

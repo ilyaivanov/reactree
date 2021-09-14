@@ -5,3 +5,10 @@ type Item = {
   isOpen: boolean;
   isEditing?: boolean;
 };
+
+type AppState = {
+  root: Item;
+  path: Path;
+};
+
+type Path = number[];

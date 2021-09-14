@@ -1,10 +1,10 @@
 import { memo, useEffect } from "react";
-import * as tree from "./domain/itemsTree";
-import { useWindowSize } from "./infra/useWindowDimensions";
-import { Scrollbar } from "./scrollbar";
-import { ItemView } from "./tree/ItemView";
-import { useItems } from "./useItems";
-import { colors, spacings } from "./designSystem";
+import * as tree from "../domain/itemsTree";
+import { useWindowSize, useItems } from "./hooks";
+import { Scrollbar } from "./Scrollbar";
+import { ItemView } from "./ItemView";
+import { colors, spacings } from "../designSystem";
+import "./App.css";
 
 const openItemsCount = (item: Item): number => {
   let count = 0;
@@ -16,20 +16,29 @@ function App() {
   const [{ root, path }, dispatch] = useItems();
   const windowSize = useWindowSize();
 
+  console.log(path);
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "ArrowDown") dispatch({ type: "move-down" });
-      if (e.code === "ArrowUp") dispatch({ type: "move-up" });
-      if (e.code === "ArrowLeft") dispatch({ type: "move-left" });
-      if (e.code === "ArrowRight") dispatch({ type: "move-right" });
-      if (e.code === "KeyE") {
+      if (e.code === "ArrowLeft" && e.altKey && e.shiftKey)
+        dispatch({ type: "selection/moveLeft" });
+      else if (e.code === "ArrowRight" && e.altKey && e.shiftKey)
+        dispatch({ type: "selection/moveRight" });
+      else if (e.code === "ArrowUp" && e.altKey && e.shiftKey)
+        dispatch({ type: "movement/moveUp" });
+      else if (e.code === "ArrowDown" && e.altKey && e.shiftKey)
+        dispatch({ type: "movement/moveDown" });
+      else if (e.code === "ArrowUp") dispatch({ type: "move-up" });
+      else if (e.code === "ArrowDown") dispatch({ type: "move-down" });
+      else if (e.code === "ArrowUp") dispatch({ type: "move-up" });
+      else if (e.code === "ArrowLeft") dispatch({ type: "move-left" });
+      else if (e.code === "ArrowRight") dispatch({ type: "move-right" });
+      else if (e.code === "KeyE") {
         //prevenring onInput event for input tag while entering edit mode
         e.preventDefault();
         dispatch({ type: "start-edit" });
-      }
-      if (e.code === "Enter")
+      } else if (e.code === "Enter")
         dispatch({ type: "create-new-item-after-selected" });
-      if (e.code === "Backspace" && e.shiftKey && e.ctrlKey)
+      else if (e.code === "Backspace" && e.shiftKey && e.ctrlKey)
         dispatch({ type: "remove-selected" });
     };
 
@@ -62,7 +71,7 @@ function App() {
 
 type SelectionBoxProps = {
   root: Item;
-  path: tree.Path;
+  path: Path;
   width: number;
 };
 

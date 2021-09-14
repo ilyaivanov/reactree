@@ -1,5 +1,5 @@
 import React from "react";
-import { clamp } from "./domain/number";
+import { clamp } from "../domain/primitives/number";
 
 type Props = {
   contentHeight: number;
@@ -12,7 +12,7 @@ type State = {
 };
 
 //Handles mouseWheel and scroll thumb drag events
-export class Scrollbar extends React.Component<Props, State> {
+export class Scrollbar extends React.PureComponent<Props, State> {
   state = {
     windowOffset: 0,
     mouseOffsetOnMouseDown: undefined,

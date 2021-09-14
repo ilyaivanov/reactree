@@ -1,11 +1,11 @@
 import { Component } from "react";
 import { colors, spacings } from "../designSystem";
 import * as tree from "../domain/itemsTree";
-import { Dispatch } from "../useItems";
+import { Dispatch } from "./hooks/useItems";
 
 type ItemViewProps = {
   item: Item;
-  path: tree.Path;
+  path: Path;
   parent?: Item;
   dispatch: Dispatch;
 };
@@ -22,12 +22,18 @@ export class ItemView extends Component<ItemViewProps> {
     const { item, dispatch } = this.props;
     if (this.props.item.isEditing)
       return (
-        <foreignObject x={10} y={-12} height={spacings.yStep} width={2000}>
+        <foreignObject
+          x={spacings.circleRadius + spacings.circleToTextDistance}
+          y={-12}
+          height={spacings.yStep}
+          width={2000}
+        >
           <input
             className="my-input"
             autoFocus
             placeholder="Enter Title"
             defaultValue={this.props.item.title}
+            onFocus={(e) => e.currentTarget.setSelectionRange(0, 0)}
             onBlur={(e) => {
               dispatch({
                 type: "finish-rename",
@@ -86,7 +92,7 @@ export class ItemView extends Component<ItemViewProps> {
         />
         <circle
           r={spacings.circleRadius}
-          fill={colors.circle}
+          fill={item.children.length === 0 ? colors.background : colors.circle}
           stroke={colors.circleBorder}
           strokeWidth={spacings.circleBorder}
         ></circle>

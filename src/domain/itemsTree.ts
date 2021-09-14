@@ -1,5 +1,5 @@
-import * as array from "./array";
-import { randomInt } from "./number";
+import * as array from "./primitives/array";
+import { randomInt } from "./primitives/number";
 
 export const createItem = (title: string, children?: Item[]): Item => ({
   id: "id_" + Math.random(),
@@ -27,8 +27,6 @@ export const getItemOffsetFromParent = (parent: Item, item: Item) => {
   return 1 + sumBy(context.slice(0, index), getChildrenCountIncludingSelf);
 };
 
-export type Path = number[];
-
 export const getItemAtPath = (root: Item, path: Path): Item => {
   let item = root;
 
@@ -45,7 +43,7 @@ export const getItemAtPath = (root: Item, path: Path): Item => {
 export const updateItemByPath = (
   root: Item,
   path: Path,
-  update: (item: Item) => Item
+  update: Func1<Item, Item>
 ): Item => {
   const updateAt = (currentItem: Item, remainingPath: Path): Item => {
     if (remainingPath.length === 0) return update(currentItem);
@@ -64,6 +62,13 @@ export const updateItemByPath = (
   };
   return updateAt(root, path);
 };
+
+export const updateItemChildren = (
+  root: Item,
+  path: Path,
+  update: Func1<Item[], Item[]>
+): Item =>
+  updateItemByPath(root, path, (i) => ({ ...i, children: update(i.children) }));
 
 export const getPathPositionFromRoot = (root: Item, path: Path) => {
   let currentPath = [];
@@ -114,6 +119,11 @@ export const openItem = (item: Item): Item => ({
   isOpen: true,
 });
 
+export const appendChild = (item: Item, newChild: Item): Item => ({
+  ...item,
+  children: item.children.concat(newChild),
+});
+
 export const getPathParent = (path: Path): Path => {
   if (isPathRoot(path)) return path;
   else return array.removeLast(path);
@@ -135,7 +145,7 @@ export const forEachVisibleChild = (
   }
 };
 
-export const randomItems = (): Item[] =>
+const randomItems = (): Item[] =>
   Array.from(new Array(randomInt(5, 20))).map((_, i) => ({
     id: "rid_" + Math.random(),
     title: "Random Item " + (i + 1),
