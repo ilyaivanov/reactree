@@ -1,5 +1,4 @@
 import * as array from "./primitives/array";
-import { randomInt } from "./primitives/number";
 
 export const createItem = (title: string, children?: Item[]): Item => ({
   id: "id_" + Math.random(),
@@ -85,7 +84,7 @@ export const getPathPositionFromRoot = (root: Item, path: Path) => {
 
 export const getItemBelow = (root: Item, path: Path): Path => {
   const item = getItemAtPath(root, path);
-  if (item.isOpen) return [...path, 0];
+  if (item.isOpen && item.children.length > 0) return [...path, 0];
   else {
     let nonLastParent = path;
     while (isLastItem(root, nonLastParent)) {
@@ -144,14 +143,6 @@ export const forEachVisibleChild = (
     });
   }
 };
-
-const randomItems = (): Item[] =>
-  Array.from(new Array(randomInt(5, 20))).map((_, i) => ({
-    id: "rid_" + Math.random(),
-    title: "Random Item " + (i + 1),
-    children: [],
-    isOpen: false,
-  }));
 
 const isLastItem = (root: Item, path: Path): boolean => {
   const [rest, lastItem] = array.pop(path);

@@ -4,6 +4,8 @@ import { useWindowSize, useItems } from "./hooks";
 import { Scrollbar } from "./Scrollbar";
 import { ItemView } from "./ItemView";
 import { colors, spacings } from "../designSystem";
+import { ErrorBoundaryClearingPendingStateSync } from "./hooks/useItems";
+
 import "./App.css";
 
 const openItemsCount = (item: Item): number => {
@@ -16,7 +18,6 @@ function App() {
   const [{ root, path }, dispatch] = useItems();
   const windowSize = useWindowSize();
 
-  console.log(path);
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.code === "ArrowLeft" && e.altKey && e.shiftKey)
@@ -89,4 +90,10 @@ const SelectionBox = memo((props: SelectionBoxProps) => {
   );
 });
 
-export default App;
+const AppWithErrorBoundary = () => (
+  <ErrorBoundaryClearingPendingStateSync>
+    <App />
+  </ErrorBoundaryClearingPendingStateSync>
+);
+
+export default AppWithErrorBoundary;

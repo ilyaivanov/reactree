@@ -1,10 +1,9 @@
-import { useReducer } from "react";
+import { Component, useReducer } from "react";
 import * as tree from "../../domain/itemsTree";
 import * as treeOperations from "../../domain/createRemoveRename";
-import { array } from "../../domain/primitives";
 import * as movement from "../../domain/movement";
 
-const rootItem = tree.createItem("Root", [
+const defaultRoot = tree.createItem("Root", [
   tree.createItem("Item 1"),
   tree.createItem("Item 2", [
     tree.createItem("Item 3"),
@@ -83,19 +82,7 @@ const reducer = (state: AppState, action: Action): AppState => {
   } else if (action.type === "remove-selected") {
     return treeOperations.removeSelectedItem(state);
   } else if (action.type === "create-new-item-after-selected") {
-    if (tree.isPathRoot(state.path)) return state;
-
-    const itemIndex = array.lastItem(state.path);
-    const nextPath = array.updateLastItem(state.path, (p) => p + 1);
-    const parentPath = tree.getPathParent(state.path);
-    const newItem = tree.createNewItem();
-    return {
-      root: tree.updateItemByPath(state.root, parentPath, (i) => ({
-        ...i,
-        children: array.insertAt(i.children, itemIndex + 1, newItem),
-      })),
-      path: nextPath,
-    };
+    return treeOperations.createNewItem(state);
   } else if (action.type === "selection/moveLeft")
     return movement.moveItemLeft(state);
   else if (action.type === "selection/moveRight")
@@ -110,11 +97,48 @@ const reducer = (state: AppState, action: Action): AppState => {
   return state;
 };
 
+const saveItems = (state: AppState): void => {
+  localStorage.setItem("items:v1", JSON.stringify(state));
+};
+
+const loadItems = (): AppState | undefined => {
+  const cache = localStorage.getItem("items:v1");
+  if (cache) return JSON.parse(cache);
+  return undefined;
+};
+
+//reducer with side-effects, I know
+let timer: NodeJS.Timer;
+export const cancelPendingStateSave = () => {
+  if (timer) {
+    clearTimeout(timer);
+  }
+};
+
+export class ErrorBoundaryClearingPendingStateSync extends Component {
+  componentDidCatch() {
+    cancelPendingStateSave();
+  }
+
+  render() {
+    return this.props.children;
+  }
+}
+
+const persistingReducer = (state: AppState, action: Action): AppState => {
+  cancelPendingStateSave();
+  const nextState = reducer(state, action);
+  timer = setTimeout(() => saveItems(nextState), 200);
+  return nextState;
+};
+
 const exhaustCheck = (a: never): never => a;
 
 export type Dispatch = (action: Action) => void;
 
 export const useItems = (): [AppState, Dispatch] => {
-  const [state, dispatch] = useReducer(reducer, { root: rootItem, path: [0] });
-  return [state, dispatch];
+  const savedState = loadItems();
+  const initialState: AppState = savedState || { root: defaultRoot, path: [0] };
+
+  return useReducer(persistingReducer, initialState);
 };

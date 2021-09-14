@@ -1,4 +1,5 @@
 import * as tree from "./itemsTree";
+import { createDummyItem } from "./specs/utils";
 
 const root = tree.createItem("Root", [
   /*1*/ tree.createItem("Item 1"),
@@ -114,6 +115,12 @@ describe("item below", () => {
 
   it("[2] is [2] (item at [2] is a item in a tree)", () =>
     expect(tree.getItemBelow(root, [2])).toEqual([2]));
+
+  it("having only root moving down does nothing", () => {
+    const initial = createDummyItem({ title: "Home", isOpen: true });
+
+    expect(tree.getItemBelow(initial, [])).toEqual([]);
+  });
 });
 
 describe("item above", () => {
