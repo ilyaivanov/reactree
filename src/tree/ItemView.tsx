@@ -26,6 +26,7 @@ export class ItemView extends Component<ItemViewProps> {
           <input
             className="my-input"
             autoFocus
+            placeholder="Enter Title"
             defaultValue={this.props.item.title}
             onBlur={(e) => {
               dispatch({
@@ -34,7 +35,6 @@ export class ItemView extends Component<ItemViewProps> {
                 newTitle: e.currentTarget.value,
               });
             }}
-            onFocus={(e) => e.currentTarget.setSelectionRange(0, 2000)}
             onKeyDown={(e) => {
               if (
                 e.key === "ArrowUp" ||

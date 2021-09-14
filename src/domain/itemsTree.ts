@@ -10,7 +10,7 @@ export const createItem = (title: string, children?: Item[]): Item => ({
 
 export const createNewItem = (): Item => ({
   id: "rid_" + Math.random(),
-  title: "New Item",
+  title: "",
   children: [],
   isOpen: false,
   isEditing: true,
