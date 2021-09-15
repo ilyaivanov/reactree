@@ -1,12 +1,5 @@
 import * as array from "./primitives/array";
 
-export const createItem = (title: string, children?: Item[]): Item => ({
-  id: "id_" + Math.random(),
-  title,
-  isOpen: children ? children.length > 0 : false,
-  children: children || [],
-});
-
 export const createNewItem = (): Item => ({
   id: "rid_" + Math.random(),
   title: "",

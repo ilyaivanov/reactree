@@ -1,5 +1,5 @@
-import { createDummyItem } from "./specs/utils";
-import * as sut from "./createRemoveRename";
+import { createDummyItem } from "./utils";
+import * as sut from "../createRemoveRename";
 
 it("creating a new item after first create new item after it", () => {
   const state: AppState = {

@@ -3,15 +3,15 @@ import * as tree from "../../domain/itemsTree";
 import * as treeOperations from "../../domain/createRemoveRename";
 import * as movement from "../../domain/movement";
 
-const defaultRoot = tree.createItem("Root", [
-  tree.createItem("Item 1"),
-  tree.createItem("Item 2", [
-    tree.createItem("Item 3"),
-    tree.createItem("Item 4"),
-    tree.createItem("Item 5"),
-  ]),
-  tree.createItem("Item 6"),
-]);
+const defaultState: AppState = {
+  root: {
+    id: "ID_HOME",
+    isOpen: true,
+    title: "Home",
+    children: [],
+  },
+  path: [],
+};
 
 type PlainAction<T> = { type: T };
 
@@ -138,7 +138,7 @@ export type Dispatch = (action: Action) => void;
 
 export const useItems = (): [AppState, Dispatch] => {
   const savedState = loadItems();
-  const initialState: AppState = savedState || { root: defaultRoot, path: [0] };
+  const initialState: AppState = savedState || defaultState;
 
   return useReducer(persistingReducer, initialState);
 };

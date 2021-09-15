@@ -3,21 +3,8 @@ import {
   moveItemLeft,
   moveItemDown,
   moveItemUp,
-} from "./movement";
-
-export const createDummyItem = (
-  title: string | Partial<Item>,
-  children?: Item[]
-): Item => {
-  const props: Partial<Item> = typeof title === "string" ? { title } : title;
-  return {
-    id: "id_" + props.title,
-    isOpen: false,
-    children: children || [],
-    title: "",
-    ...props,
-  };
-};
+} from "../movement";
+import { createDummyItem } from "./utils";
 
 it("moving second item right places it as first child of first and opens it", () => {
   const initial = createDummyItem("Home", [

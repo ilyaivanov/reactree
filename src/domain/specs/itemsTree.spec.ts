@@ -1,17 +1,17 @@
-import * as tree from "./itemsTree";
-import { createDummyItem } from "./specs/utils";
+import * as tree from "../itemsTree";
+import { createDummyItem } from "./utils";
 
-const root = tree.createItem("Root", [
-  /*1*/ tree.createItem("Item 1"),
-  /*2*/ tree.createItem("Item 2", [
-    /*1*/ tree.createItem("Item 3"),
-    /*2*/ tree.createItem("Item 4", [
-      /*1*/ tree.createItem("Item 5"),
-      /*2*/ tree.createItem("Item 6"),
-      /*3*/ tree.createItem("Item 7"),
+const root = createDummyItem({ title: "Root", isOpen: true }, [
+  /*1*/ createDummyItem("Item 1"),
+  /*2*/ createDummyItem({ title: "Item 2", isOpen: true }, [
+    /*1*/ createDummyItem("Item 3"),
+    /*2*/ createDummyItem({ title: "Item 4", isOpen: true }, [
+      /*1*/ createDummyItem("Item 5"),
+      /*2*/ createDummyItem("Item 6"),
+      /*3*/ createDummyItem("Item 7"),
     ]),
   ]),
-  /*8*/ tree.createItem("Item 8"),
+  /*8*/ createDummyItem("Item 8"),
 ]);
 
 it("item offset for the first root child is 1", () =>
