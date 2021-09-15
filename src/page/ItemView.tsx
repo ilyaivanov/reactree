@@ -8,6 +8,7 @@ type ItemViewProps = {
   path: Path;
   parent?: Item;
   dispatch: Dispatch;
+  level: number;
 };
 
 export class ItemView extends Component<ItemViewProps> {
@@ -20,15 +21,18 @@ export class ItemView extends Component<ItemViewProps> {
 
   renderText = () => {
     const { item, dispatch } = this.props;
+    // const metrics = ctx.measureText(item.title);
+    // console.log(item.title, metrics);
+    console.log("render");
     if (this.props.item.isEditing)
       return (
         <foreignObject
           x={spacings.circleRadius + spacings.circleToTextDistance}
-          y={-12}
-          height={spacings.yStep}
-          width={2000}
+          y={-11}
+          height={300}
+          width={getTextBoxWidth(this.props.level)}
         >
-          <input
+          <textarea
             className="my-input"
             autoFocus
             placeholder="Enter Title"
@@ -64,15 +68,28 @@ export class ItemView extends Component<ItemViewProps> {
       );
     else
       return (
-        <text
+        <foreignObject
           x={spacings.circleRadius + spacings.circleToTextDistance}
-          dy="0.32em"
-          fill="currentColor"
-          style={{ whiteSpace: "pre" }}
-          fontSize={14}
+          y={-12}
+          height={300}
+          width={getTextBoxWidth(this.props.level)}
         >
-          {item.title}
-        </text>
+          <span
+            ref={(e) => console.log("ref", e?.clientWidth)}
+            style={{ fontSize: 14 }}
+          >
+            {item.title}
+          </span>
+        </foreignObject>
+        // <text
+        //   x={spacings.circleRadius + spacings.circleToTextDistance}
+        //   dy="0.32em"
+        //   fill="currentColor"
+        //   style={{ whiteSpace: "pre" }}
+        //   fontSize={14}
+        // >
+        //   {item.title}
+        // </text>
       );
   };
 
@@ -102,6 +119,7 @@ export class ItemView extends Component<ItemViewProps> {
           {item.isOpen &&
             item.children.map((child, index) => (
               <ItemView
+                level={this.props.level + 1}
                 key={child.id}
                 parent={item}
                 item={child}
@@ -125,3 +143,7 @@ const svgPath = (isRoot: boolean, distanceToParent: number): string =>
         distanceToParent - spacings.circleRadius
       }`
     : "";
+
+const getTextBoxWidth = (level: number) => {
+  return window.innerWidth - (spacings.gap + level * spacings.xStep) - 20;
+};

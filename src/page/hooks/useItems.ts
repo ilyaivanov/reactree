@@ -2,6 +2,7 @@ import { Component, useReducer } from "react";
 import * as tree from "../../domain/itemsTree";
 import * as treeOperations from "../../domain/createRemoveRename";
 import * as movement from "../../domain/movement";
+import { createRandomTree } from "../../domain/generateRandomTree";
 
 const defaultState: AppState = {
   root: {
@@ -102,9 +103,13 @@ const saveItems = (state: AppState): void => {
 };
 
 const loadItems = (): AppState | undefined => {
-  const cache = localStorage.getItem("items:v1");
-  if (cache) return JSON.parse(cache);
-  return undefined;
+  return {
+    root: createRandomTree(),
+    path: [],
+  };
+  // const cache = localStorage.getItem("items:v1");
+  // if (cache) return JSON.parse(cache);
+  // return undefined;
 };
 
 //reducer with side-effects, I know

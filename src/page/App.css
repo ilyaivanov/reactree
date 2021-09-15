@@ -5,10 +5,31 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #0b101c;
+  color: white;
 }
 
 svg {
   display: block;
+}
+.app {
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+  overflow-y: overlay;
+  margin-right: 10px;
+}
+
+.app::-webkit-scrollbar {
+  width: 11px;
+}
+
+.app::-webkit-scrollbar-thumb {
+  background-color: #424242;
+}
+
+.app::-webkit-scrollbar-thumb:hover {
+  background-color: #4f4f4f;
 }
 
 /* use BEM for the love of GOD before it's too late */
