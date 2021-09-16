@@ -13,8 +13,13 @@ it("creating a new item after first create new item after it", () => {
   Math.random = () => "DUMMYID" as unknown as number;
   const expectedStateAfterCreation: AppState = {
     root: createDummyItem("Home", [
-      createDummyItem("First"),
-      createDummyItem({ id: "rid_DUMMYID", title: "", isEditing: true }),
+      createDummyItem({ title: "First", isSelected: false }),
+      createDummyItem({
+        id: "rid_DUMMYID",
+        title: "",
+        isEditing: true,
+        isSelected: true,
+      }),
       createDummyItem("Second"),
     ]),
     path: [1],

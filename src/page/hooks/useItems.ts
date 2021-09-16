@@ -2,12 +2,13 @@ import { Component, useReducer } from "react";
 import * as tree from "../../domain/itemsTree";
 import * as treeOperations from "../../domain/createRemoveRename";
 import * as movement from "../../domain/movement";
-import { createRandomTree } from "../../domain/generateRandomTree";
+import * as selection from "../../domain/selection";
 
 const defaultState: AppState = {
   root: {
     id: "ID_HOME",
     isOpen: true,
+    isSelected: true,
     title: "Home",
     children: [],
   },
@@ -35,35 +36,36 @@ type Action =
     };
 
 const reducer = (state: AppState, action: Action): AppState => {
-  // console.log(`Dispatching ${action.type}`);
-  const updatePath = (path: Path): AppState => ({
-    path,
-    root: state.root,
-  });
-
   const updateRoot = (root: Item): AppState => ({
     root,
     path: state.path,
   });
 
   if (action.type === "move-down")
-    return updatePath(tree.getItemBelow(state.root, state.path));
+    return selection.changeSelection(
+      state,
+      tree.getItemBelow(state.root, state.path)
+    );
   else if (action.type === "move-up")
-    return updatePath(tree.getItemAbove(state.root, state.path));
+    return selection.changeSelection(
+      state,
+      tree.getItemAbove(state.root, state.path)
+    );
   else if (action.type === "move-left") {
     const item = tree.getItemAtPath(state.root, state.path);
     return item.isOpen
       ? updateRoot(
           tree.updateItemByPath(state.root, state.path, tree.closeItem)
         )
-      : updatePath(tree.getPathParent(state.path));
+      : selection.changeSelection(state, tree.getPathParent(state.path));
   } else if (action.type === "move-right") {
     const item = tree.getItemAtPath(state.root, state.path);
     if (!item.isOpen && item.children.length > 0)
       return updateRoot(
         tree.updateItemByPath(state.root, state.path, tree.openItem)
       );
-    else if (item.children.length > 0) return updatePath([...state.path, 0]);
+    else if (item.children.length > 0)
+      return selection.changeSelection(state, [...state.path, 0]);
     else return state;
   } else if (action.type === "start-edit") {
     return updateRoot(
@@ -81,7 +83,7 @@ const reducer = (state: AppState, action: Action): AppState => {
       }))
     );
   } else if (action.type === "remove-selected") {
-    return treeOperations.removeSelectedItem(state);
+    return treeOperations.removeSelectedItemAnsSelectPrevious(state);
   } else if (action.type === "create-new-item-after-selected") {
     return treeOperations.createNewItem(state);
   } else if (action.type === "selection/moveLeft")
@@ -103,13 +105,9 @@ const saveItems = (state: AppState): void => {
 };
 
 const loadItems = (): AppState | undefined => {
-  return {
-    root: createRandomTree(),
-    path: [],
-  };
-  // const cache = localStorage.getItem("items:v1");
-  // if (cache) return JSON.parse(cache);
-  // return undefined;
+  const cache = localStorage.getItem("items:v1");
+  if (cache) return JSON.parse(cache);
+  return undefined;
 };
 
 //reducer with side-effects, I know

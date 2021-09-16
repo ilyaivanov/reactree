@@ -4,9 +4,14 @@ import { useWindowSize, useItems } from "./hooks";
 import { Scrollbar } from "./Scrollbar";
 import { ItemView } from "./ItemView";
 import { colors, spacings } from "../designSystem";
-import { ErrorBoundaryClearingPendingStateSync } from "./hooks/useItems";
+import {
+  Dispatch,
+  ErrorBoundaryClearingPendingStateSync,
+} from "./hooks/useItems";
 
 import "./App.css";
+import React from "react";
+import { TitleInput } from "./TitleInput";
 
 const openItemsCount = (item: Item): number => {
   let count = 0;
@@ -20,6 +25,7 @@ function App() {
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      e.preventDefault();
       if (e.code === "ArrowLeft" && e.altKey && e.shiftKey)
         dispatch({ type: "selection/moveLeft" });
       else if (e.code === "ArrowRight" && e.altKey && e.shiftKey)
@@ -52,24 +58,10 @@ function App() {
     <div className="app">
       <div className="itemsCountLabel">{itemsCount}</div>
       <div style={{ paddingRight: 10, fontSize: 14 }}>
-        <TextCanvas root={root} />
+        <div style={{ paddingTop: spacings.gap - 6 }}>
+          <TextItem item={root} level={0} dispatch={dispatch} path={[]} />
+        </div>
       </div>
-      {/* 
-      <Scrollbar
-        windowHeight={windowSize.height}
-        contentHeight={itemsCount * spacings.yStep + 2 * spacings.gap}
-      >
-        {(windowOffset) => (
-          // <svg
-          //   viewBox={`0 ${windowOffset} ${windowSize.width} ${windowSize.height}`}
-          //   width={windowSize.width}
-          //   height={windowSize.height}
-          // >
-          //   <SelectionBox root={root} path={path} width={windowSize.width} />
-          //   <ItemView item={root} path={[]} dispatch={dispatch} level={0} />
-          // </svg>
-        )}
-      </Scrollbar> */}
     </div>
   );
 }
@@ -99,32 +91,56 @@ const AppWithErrorBoundary = () => (
     <App />
   </ErrorBoundaryClearingPendingStateSync>
 );
-
-const TextCanvas = ({ root }: { root: Item }) => {
-  return (
-    <div style={{ paddingTop: spacings.gap - 6 }}>
-      <TextItem item={root} level={0} />
-    </div>
-  );
+type Props = {
+  item: Item;
+  level: number;
+  dispatch: Dispatch;
+  path: Path;
 };
-
-const TextItem = ({ item, level }: { item: Item; level: number }) => {
-  return (
-    <div
-      style={{
-        paddingLeft: level == 0 ? spacings.gap : spacings.xStep,
-        marginTop: 8,
-        lineHeight: 1.2,
-      }}
-    >
-      <div>{item.title}</div>
-      <div style={{ borderLeft: "1px solid grey" }}>
-        {item.isOpen &&
-          item.children.map((child) => (
-            <TextItem key={child.id} item={child} level={level + 1} />
-          ))}
+class TextItem extends React.Component<Props> {
+  shouldComponentUpdate(nextProps: Props) {
+    return (
+      nextProps.item !== this.props.item || nextProps.level !== this.props.level
+    );
+  }
+  render() {
+    const { item, level, dispatch, path } = this.props;
+    return (
+      <div
+        style={{
+          paddingLeft: level == 0 ? spacings.gap : spacings.xStep,
+          marginTop: 8,
+          lineHeight: 1.2,
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: item.isSelected
+              ? colors.selectionColor
+              : undefined,
+          }}
+        >
+          {item.isEditing ? (
+            <TitleInput title={item.title} path={path} dispatch={dispatch} />
+          ) : (
+            item.title
+          )}
+        </div>
+        <div style={{ borderLeft: "1px solid grey" }}>
+          {item.isOpen &&
+            item.children.map((child, index) => (
+              <TextItem
+                key={child.id}
+                item={child}
+                level={level + 1}
+                dispatch={dispatch}
+                path={[...path, index]}
+              />
+            ))}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+}
+
 export default AppWithErrorBoundary;
