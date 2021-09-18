@@ -25,8 +25,8 @@ type Action =
   | PlainAction<"start-edit">
   | PlainAction<"remove-selected">
   | PlainAction<"create-new-item-after-selected">
-  | PlainAction<"selection/moveRight">
-  | PlainAction<"selection/moveLeft">
+  | PlainAction<"movement/moveRight">
+  | PlainAction<"movement/moveLeft">
   | PlainAction<"movement/moveDown">
   | PlainAction<"movement/moveUp">
   | {
@@ -86,9 +86,9 @@ const reducer = (state: AppState, action: Action): AppState => {
     return treeOperations.removeSelectedItemAnsSelectPrevious(state);
   } else if (action.type === "create-new-item-after-selected") {
     return treeOperations.createNewItem(state);
-  } else if (action.type === "selection/moveLeft")
+  } else if (action.type === "movement/moveLeft")
     return movement.moveItemLeft(state);
-  else if (action.type === "selection/moveRight")
+  else if (action.type === "movement/moveRight")
     return movement.moveItemRight(state);
   else if (action.type === "movement/moveDown")
     return movement.moveItemDown(state);
@@ -118,6 +118,7 @@ export const cancelPendingStateSave = () => {
   }
 };
 
+//This boundary is used to avoid invalid state saved to localStorage
 export class ErrorBoundaryClearingPendingStateSync extends Component {
   componentDidCatch() {
     cancelPendingStateSave();

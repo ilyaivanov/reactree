@@ -35,12 +35,12 @@ export const createNewItem = (state: AppState): AppState => {
   const parentPath = tree.getPathParent(state.path);
   const newItem = tree.createNewItem();
 
-  const s1 = selection.unselectAt(state.path)(state);
+  const s1 = selection.unselectAt(state, state.path);
   const newRoot = tree.updateItemByPath(s1.root, parentPath, (i) => ({
     ...i,
     children: array.insertAt(i.children, itemIndex + 1, newItem),
   }));
-  const s2 = selection.selectAt(nextPath)({ root: newRoot, path: nextPath });
+  const s2 = selection.selectAt({ root: newRoot, path: nextPath }, nextPath);
   return s2;
 };
 
