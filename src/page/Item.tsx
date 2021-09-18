@@ -1,5 +1,6 @@
 import React from "react";
 import { colors, spacings } from "../designSystem";
+import { style } from "../styles/style";
 import { Dispatch } from "./hooks/useItems";
 import { TitleInput } from "./TitleInput";
 
@@ -18,20 +19,12 @@ export class TextItem extends React.Component<Props> {
   render() {
     const { item, level, dispatch, path } = this.props;
     return (
-      <div
-        style={{
-          paddingLeft: level == 0 ? spacings.gap : spacings.xStep,
-          marginTop: 8,
-          lineHeight: 1.2,
-        }}
-      >
+      <div className={"item " + itemLevelClass(level)}>
         <div
-          style={{
-            backgroundColor: item.isSelected
-              ? colors.selectionColor
-              : undefined,
-            position: "relative",
-          }}
+          className={cn({
+            "item-title": true,
+            "item-title__selected": item.isSelected,
+          })}
         >
           {!item.isOpen && item.children.length > 0 && (
             <span style={{ position: "absolute", left: -5, top: -4 }}>.</span>
@@ -42,7 +35,7 @@ export class TextItem extends React.Component<Props> {
             item.title || <div>&nbsp;</div>
           )}
         </div>
-        <div style={{ borderLeft: "1px solid grey" }}>
+        <div className="item-children">
           {item.isOpen &&
             item.children.map((child, index) => (
               <TextItem
@@ -58,3 +51,33 @@ export class TextItem extends React.Component<Props> {
     );
   }
 }
+
+const itemLevelClass = (level: number): string => `item__level${level}`;
+for (var level = 0; level < 20; level++) {
+  style.class(itemLevelClass(level), {
+    paddingLeft: level == 0 ? spacings.gap : spacings.xStep,
+  });
+}
+
+style.class("item", {
+  marginTop: 6,
+  lineHeight: 1.2,
+});
+
+style.class("item-children", {
+  borderLeft: "1px solid grey",
+});
+
+style.class("item-title", {
+  position: "relative",
+});
+
+style.class("item-title__selected", {
+  backgroundColor: colors.selectionColor,
+});
+
+const cn = (classes: {}) =>
+  Object.entries(classes)
+    .filter(([_, value]) => !!value)
+    .map(([key]) => key)
+    .join(" ");

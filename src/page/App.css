@@ -6,12 +6,14 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #0b101c;
+  font-size: 14px;
   color: white;
 }
 
 svg {
   display: block;
 }
+
 .app {
   height: 100vh;
   width: 100vw;
@@ -30,54 +32,4 @@ svg {
 
 .app::-webkit-scrollbar-thumb:hover {
   background-color: #4f4f4f;
-}
-
-/* use BEM for the love of GOD before it's too late */
-.scrollbar {
-  height: 100vh;
-  width: 100vw;
-}
-
-.scrollThumb {
-  position: absolute;
-  right: 0;
-  width: 15px;
-  background-color: #424242;
-  cursor: pointer;
-  transition: background-color 100ms;
-  user-select: none;
-}
-
-.scrollThumb:hover {
-  background-color: #4f4f4f;
-}
-
-.scrollThumb:active {
-  background-color: #5e5e5e;
-}
-
-.itemsCountLabel {
-  position: fixed;
-  left: 0px;
-  width: 20px;
-  text-align: center;
-  top: calc(50vh - 10px);
-  color: gray;
-  font-weight: bold;
-  transform: rotateZ(-90deg);
-}
-
-.my-input {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  box-sizing: border-box;
-  background-color: transparent;
-  border: none;
-  outline: none;
-  color: white;
-  font-size: 14px;
-  padding: 0;
-  width: 100%;
-  /* border-bottom: 2px solid white; */
 }

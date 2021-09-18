@@ -1,3 +1,4 @@
+import { style } from "../styles/style";
 import { Dispatch } from "./hooks/useItems";
 
 type Props = {
@@ -9,7 +10,7 @@ type Props = {
 export const TitleInput = ({ title, path, dispatch }: Props) => (
   <textarea
     autoFocus
-    className="my-input"
+    className="item-title-input"
     placeholder="Enter Title"
     defaultValue={title}
     style={{
@@ -48,3 +49,15 @@ export const TitleInput = ({ title, path, dispatch }: Props) => (
     }}
   />
 );
+
+style.class("item-title-input ", {
+  boxSizing: `border-box`,
+  backgroundColor: "transparent",
+  border: "none",
+  outline: "none",
+  color: "white",
+  fontSize: 14,
+  padding: 0,
+  width: "100%",
+  fontFamily: `inherit`,
+});

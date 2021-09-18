@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useItems } from "./hooks";
-import { spacings } from "../designSystem";
 import { ErrorBoundaryClearingPendingStateSync } from "./hooks/useItems";
+import { TextItem } from "./Item";
 
 import "./App.css";
-import { TextItem } from "./Item";
+
 function App() {
   const [{ root, path }, dispatch] = useItems();
 
@@ -40,11 +40,7 @@ function App() {
 
   return (
     <div className="app">
-      <div style={{ paddingRight: 10, fontSize: 14 }}>
-        <div style={{ paddingTop: spacings.gap - 6 }}>
-          <TextItem item={root} level={0} dispatch={dispatch} path={[]} />
-        </div>
-      </div>
+      <TextItem item={root} level={0} dispatch={dispatch} path={[]} />
     </div>
   );
 }
