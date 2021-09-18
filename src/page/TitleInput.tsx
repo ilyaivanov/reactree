@@ -13,13 +13,6 @@ export const TitleInput = ({ title, path, dispatch }: Props) => (
     className="item-title-input"
     placeholder="Enter Title"
     defaultValue={title}
-    style={{
-      lineHeight: 1.2,
-      display: "block",
-      marginBottom: -1,
-      height: 10,
-      resize: "none",
-    }}
     onFocus={(e) => e.currentTarget.setSelectionRange(0, 0)}
     ref={(el) => {
       if (el) {
@@ -50,7 +43,7 @@ export const TitleInput = ({ title, path, dispatch }: Props) => (
   />
 );
 
-style.class("item-title-input ", {
+style.class("item-title-input", {
   boxSizing: `border-box`,
   backgroundColor: "transparent",
   border: "none",
@@ -60,4 +53,9 @@ style.class("item-title-input ", {
   padding: 0,
   width: "100%",
   fontFamily: `inherit`,
+  lineHeight: 1.2,
+  display: "block",
+  marginBottom: -1,
+  height: 10,
+  resize: "none",
 });

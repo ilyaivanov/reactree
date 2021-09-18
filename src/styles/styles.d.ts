@@ -109,4 +109,5 @@ type Styles = Partial<{
   visibility: "hidden";
   content: `" "`;
   objectFit: "cover";
+  resize: "none";
 }>;

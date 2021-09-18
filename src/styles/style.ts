@@ -1,6 +1,10 @@
 import { cssRuleToString } from "./convertion";
 
+const existingStyles = document.getElementById("app-styles");
+if (existingStyles) existingStyles.remove();
+
 const styleElement = document.createElement("style");
+
 styleElement.id = "app-styles";
 document.head.appendChild(styleElement);
 

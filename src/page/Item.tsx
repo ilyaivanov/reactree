@@ -27,7 +27,7 @@ export class TextItem extends React.Component<Props> {
           })}
         >
           {!item.isOpen && item.children.length > 0 && (
-            <span style={{ position: "absolute", left: -5, top: -4 }}>.</span>
+            <span className="item-childrenIndicator">.</span>
           )}
           {item.isEditing ? (
             <TitleInput title={item.title} path={path} dispatch={dispatch} />
@@ -55,12 +55,12 @@ export class TextItem extends React.Component<Props> {
 const itemLevelClass = (level: number): string => `item__level${level}`;
 for (var level = 0; level < 20; level++) {
   style.class(itemLevelClass(level), {
-    paddingLeft: level == 0 ? spacings.gap : spacings.xStep,
+    paddingLeft: level === 0 ? spacings.gap : spacings.xStep,
   });
 }
 
 style.class("item", {
-  marginTop: 6,
+  // marginTop: 6,
   lineHeight: 1.2,
 });
 
@@ -68,16 +68,25 @@ style.class("item-children", {
   borderLeft: "1px solid grey",
 });
 
+style.class("item-childrenIndicator", {
+  position: "absolute",
+  left: -5,
+  top: -1,
+});
+
 style.class("item-title", {
+  //used to position item-childrenIndicator
   position: "relative",
+  paddingTop: 3,
+  paddingBottom: 3,
 });
 
 style.class("item-title__selected", {
   backgroundColor: colors.selectionColor,
 });
 
-const cn = (classes: {}) =>
+const cn = (classes: Record<string, boolean | undefined>) =>
   Object.entries(classes)
-    .filter(([_, value]) => !!value)
+    .filter(([_, value]) => value)
     .map(([key]) => key)
     .join(" ");
